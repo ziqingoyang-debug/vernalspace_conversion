@@ -1,0 +1,131 @@
+
+html = """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>分析主题2_页面性能分析.html</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+<h1>站内转化分析 Demo 看板（Theme 2 已按用户映射更新）</h1>
+
+<h2>分析主题2_页面性能分析.html</h2>
+
+<div style="margin:10px 0;">
+  <label>页面类型：</label>
+  <select id="pageType">
+    <option value="home">主页（Home）</option>
+    <option value="category">类目页（Category）</option>
+    <option value="pdp">商详页（PDP）</option>
+  </select>
+
+  <label style="margin-left:15px;">具体页面：</label>
+  <select id="pageDetail"></select>
+</div>
+
+<div id="bounceChart" style="width:700px;height:300px;border:1px solid #ddd;margin-top:12px;"></div>
+<div id="loadChart" style="width:700px;height:300px;border:1px solid #ddd;margin-top:12px;"></div>
+<div id="heatChart" style="width:700px;height:300px;border:1px solid #ddd;margin-top:12px;"></div>
+
+<script>
+// ====== 页面类型 → 具体页面映射（按你确认的示例） ======
+const pageMapping = {
+  home: [
+    "首页-首页",
+    "首页-Banner",
+    "首页-活动",
+    "首页-推荐位"
+  ],
+  category: [
+    "升降桌类目页",
+    "柜子类目页",
+    "配件类目页",
+    "H系列类目页",
+    "W系列类目页"
+  ],
+  pdp: [
+    "v0.7整桌",
+    "v0.7一型桌",
+    "H1.0桌",
+    "H1.2桌",
+    "W0.8桌",
+    "W1.0桌"
+  ]
+};
+
+// 初始化具体页面
+function updatePageDetail(){
+  const type = document.getElementById("pageType").value;
+  const detailSelect = document.getElementById("pageDetail");
+  detailSelect.innerHTML = "";
+  pageMapping[type].forEach(p=>{
+    const opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p;
+    detailSelect.appendChild(opt);
+  });
+}
+updatePageDetail();
+document.getElementById("pageType").addEventListener("change", updatePageDetail);
+
+// ====== 图表初始化 ======
+var bounceChart = echarts.init(document.getElementById('bounceChart'));
+var loadChart = echarts.init(document.getElementById('loadChart'));
+var heatChart = echarts.init(document.getElementById('heatChart'));
+
+function renderCharts(){
+    const days = ["11-01","11-05","11-09","11-13","11-17","11-21","11-25"];
+    const bounceData = days.map(()=>Math.round(Math.random()*10 + 30));
+    const loadData = days.map(()=>Number((Math.random()*1.5+2.0).toFixed(2)));
+
+    bounceChart.setOption({
+        title:{text:"跳出率趋势"},
+        xAxis:{type:"category",data:days},
+        yAxis:{type:"value"},
+        series:[{type:"line",smooth:true,data:bounceData}]
+    });
+
+    loadChart.setOption({
+        title:{text:"平均加载时间趋势"},
+        xAxis:{type:"category",data:days},
+        yAxis:{type:"value"},
+        series:[{type:"line",smooth:true,data:loadData}]
+    });
+
+    // Heatmap (7x7)
+    const x = ["Header","Banner","Content-Top","Content-Mid","Content-Bottom","CTA","Footer"];
+    const y = ["11-01","11-05","11-09","11-13","11-17","11-21","11-25"];
+    const heatData = [];
+    for (let i=0;i<y.length;i++){
+      for (let j=0;j<x.length;j++){
+        heatData.push([j,i,Math.round(Math.random()*100)]);
+      }
+    }
+
+    heatChart.setOption({
+        title:{text:"页面点击热力图"},
+        tooltip:{},
+        xAxis:{type:"category",data:x},
+        yAxis:{type:"category",data:y},
+        visualMap:{min:0,max:100,calculable:true,right:0},
+        series:[{type:"heatmap",data:heatData}]
+    });
+}
+
+renderCharts();
+
+// 切换具体页面时刷新数据
+document.getElementById("pageDetail").addEventListener("change", renderCharts);
+
+</script>
+
+</body>
+</html>
+"""
+
+file_path = "/mnt/data/分析主题2_页面性能分析.html"
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+file_path
